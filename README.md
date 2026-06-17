@@ -31,9 +31,40 @@ CustεmAI acts as the execution layer, instantly translating behavioral signals 
 
 ### 🏃‍♂️ Run Locally 
 
-The fastest way to test the system is to run the React application locally. You will need a free API key from [Groq](https://console.groq.com/).
+Follow these steps to run the application on your local machine. You will need a free API key from [Groq](https://console.groq.com/).
 
 **1. Clone the repository:**
 ```bash
-git clone [https://github.com/your-username/custemai.git](https://github.com/your-username/custemai.git)
-cd custemai
+git clone [https://github.com/Pakhi-308/CustemAI.git](https://github.com/Pakhi-308/CustemAI.git)
+cd CustemAI
+```
+
+**2. Install dependencies:**
+```bash
+npm install
+```
+
+**3. Configure Environment Variables:**
+Create a `.env` file in the root directory and add your Groq API key:
+```env
+REACT_APP_GROQ_KEY=gsk_your_api_key_here
+```
+
+**4. Start the development server:**
+```bash
+npm start
+```
+*Open your browser and navigate to: [http://localhost:3000](http://localhost:3000)*
+
+---
+
+### 📡 Live Demo
+
+🔗 [View the Deployed Application Here](https://custem-ai.vercel.app/)  
+
+---
+
+### 👨‍💻 Team: Pakhi's Team
+
+* **Pakhi Shukla** 
+* **Kavyansh Vats**
