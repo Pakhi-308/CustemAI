@@ -54,9 +54,21 @@ const BASE_PERSONAS = [
   },
 ];
 
+const SUGGESTED_BRANDS = [
+  "Nike",
+  "Zomato",
+  "HDFC Bank",
+  "Apple",
+  "Sephora",
+  "Myntra",
+  "Starbucks",
+  "Epsilon"
+];
+
 function App() {
   const [stage, setStage] = useState("landing");
   const [brand, setBrand] = useState("");
+  const [isCustomBrand, setIsCustomBrand] = useState(false);
   const [industry, setIndustry] = useState("Retail");
   const [selectedPersona, setSelectedPersona] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -66,7 +78,7 @@ function App() {
 
   const handleStart = () => {
     if (!brand.trim()) {
-      setError("Please enter a brand or product name");
+      setError("Please select or enter a brand");
       return;
     }
     setError("");
@@ -88,28 +100,30 @@ function App() {
       const response = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
         max_tokens: 1000,
-       temperature: 1.0,
+        temperature: 0.8,
         messages: [
           {
             role: "system",
             content:
-              "You are CustεmAI, an AI marketing personalization engine. You analyze customer personas and generate hyper-personalized marketing content. Always respond with ONLY valid JSON, no extra text, no markdown formatting, no code fences.",
+              "You are CustεmAI, an AI marketing personalization engine. You analyze customer personas and generate hyper-personalized marketing content. Always respond with ONLY valid JSON, no extra text, no markdown formatting, no code fences. Ensure engagement_score is a number, not a string.",
           },
           {
             role: "user",
-content: `Brand: ${brand}
+            content: `Brand: ${brand}
 Industry: ${industry}
-Persona name: ${persona.name}
+Target Persona: ${persona.name}
 Persona traits: ${persona.traits}
 
-Generate hyper-personalized marketing content for this persona. Respond with ONLY this JSON structure, replacing every value with content specific to this exact brand and persona:
+Generate hyper-personalized marketing content for this persona in this exact JSON shape:
 {
-  "insight": "one strategic insight, 2 sentences max, about how to engage this persona",
+  "insight": "one strategic insight, 2 sentences max, about how to engage the target persona",
   "email": { "subject": "email subject line", "body": "2 line email body" },
   "push": { "title": "push notification title", "body": "one line push body" },
   "display": { "headline": "display ad headline", "subtext": "short subtext" },
-  "engagement_score": "pick a realistic predicted engagement percentage between 60 and 98 based on how well this channel mix fits this specific persona and industry — avoid round numbers like 80, 85, or 90"
-}`,
+  "engagement_score": 0
+}
+
+CRITICAL AI INSTRUCTION: Replace the 0 in engagement_score with a specific, unique integer between 58 and 97. Do NOT use generic round numbers like 80, 85, or 90. The score MUST vary drastically based on how inherently difficult the persona is to convert. For example: Deal Hunters are notoriously fickle and should get a lower score (e.g., 63-74). Loyalty Seekers are highly engaged and should get a higher score (e.g., 88-96). Make it realistic and highly specific every single time.`,
           },
         ],
       });
@@ -141,7 +155,7 @@ Generate hyper-personalized marketing content for this persona. Respond with ONL
       <div className="landing">
         <div className="landing-card">
           <div className="logo-row">
-            <div className="logo-badge">C</div>
+            <div className="logo-badge">&epsilon;</div>
             <div>
               <h1>Cust&epsilon;mAI</h1>
               <p className="subtitle">Hyper-personalization at scale</p>
@@ -152,13 +166,38 @@ Generate hyper-personalized marketing content for this persona. Respond with ONL
           </p>
 
           <label className="field-label">Brand or product name</label>
-          <input
-            type="text"
-            placeholder="e.g. Nike, Zomato, HDFC Bank"
-            value={brand}
-            onChange={(e) => setBrand(e.target.value)}
-            className="text-input"
-          />
+          <select
+            value={isCustomBrand ? "Other" : brand}
+            onChange={(e) => {
+              if (e.target.value === "Other") {
+                setIsCustomBrand(true);
+                setBrand(""); 
+              } else {
+                setIsCustomBrand(false);
+                setBrand(e.target.value);
+              }
+            }}
+            className="select-input"
+          >
+            <option value="" disabled>Select a brand...</option>
+            {SUGGESTED_BRANDS.map((b, i) => (
+              <option key={i} value={b}>{b}</option>
+            ))}
+            <option value="Other">Other (Type custom brand)...</option>
+          </select>
+
+          {isCustomBrand && (
+            <div style={{ marginTop: "12px", animation: "fadeIn 0.3s" }}>
+              <input
+                type="text"
+                placeholder="e.g. Uber, Tesla, Adidas"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+                className="text-input"
+                autoFocus
+              />
+            </div>
+          )}
 
           <label className="field-label">Industry</label>
           <select
@@ -189,7 +228,7 @@ Generate hyper-personalized marketing content for this persona. Respond with ONL
     <div className="dashboard">
       <div className="topbar">
         <div className="logo-row">
-          <div className="logo-badge">C</div>
+          <div className="logo-badge">&epsilon;</div>
           <div>
             <h2>Cust&epsilon;mAI</h2>
             <p className="subtitle">{brand} &middot; {industry}</p>
@@ -209,7 +248,7 @@ Generate hyper-personalized marketing content for this persona. Respond with ONL
               className={`persona-item ${selectedPersona === p.id ? "active" : ""}`}
               onClick={() => {
                 setSelectedPersona(p.id);
-                setContent(null);
+                setContent(null); 
               }}
             >
               <div className="persona-name">{p.name}</div>
@@ -229,7 +268,13 @@ Generate hyper-personalized marketing content for this persona. Respond with ONL
             </button>
           </div>
 
-          {loading && <p className="loading-text">{loadingText}</p>}
+          {loading && (
+            <div className="loading-container">
+              <div className="spinner"></div>
+              <p className="loading-text">{loadingText}</p>
+            </div>
+          )}
+          
           {error && <p className="error-text">{error}</p>}
 
           {content && (
@@ -267,6 +312,20 @@ Generate hyper-personalized marketing content for this persona. Respond with ONL
                     <Bar dataKey="score" fill="#178B5E" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
+              </div>
+
+              {/* The "Cherry on Top" Export Buttons */}
+              <div style={{ marginTop: "24px", paddingTop: "20px", borderTop: "1px solid #E5E5E0", display: "flex", justifyContent: "flex-end", gap: "12px", animation: "fadeIn 0.8s ease-out" }}>
+                <button className="ghost-btn" onClick={() => alert("Campaign saved as draft.")}>
+                  Save Draft
+                </button>
+                <button 
+                  className="primary-btn" 
+                  style={{ width: "auto", margin: "0", background: "#1A1A1A", boxShadow: "0 4px 12px rgba(26, 26, 26, 0.2)" }}
+                  onClick={() => alert("Success! JSON payload exported to Epsilon COREai pipeline.")}
+                >
+                  Export to Epsilon COREai &rarr;
+                </button>
               </div>
             </>
           )}
