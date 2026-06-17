@@ -17,6 +17,7 @@ CustεmAI acts as the execution layer, instantly translating behavioral signals 
 
 ### 🏗️ System Architecture
 
+![System Architecture](./architecture.jpg)
 
 ---
 
