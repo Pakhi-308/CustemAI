@@ -78,7 +78,4 @@ npm start
 
 ---
 
-### 👨‍💻 Team: Pakhi's Team
 
-* **Pakhi Shukla** 
-* **Kavyansh Vats**
